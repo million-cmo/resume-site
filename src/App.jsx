@@ -325,7 +325,7 @@ export function App() {
 
       <header className="topbar">
         <button className="brand-lockup" onClick={() => scrollTo("home")} aria-label="Back to top">
-          <span className="brand-mark" aria-hidden="true"><i /><i /><i /><i /><i /></span>
+          <span className="brand-mark" aria-hidden="true"><img className="z-spin" src="/favicon.svg" alt="" /></span>
           <span>
             <strong>{t.brand}</strong>
             <small>DATA · CODE · INTELLIGENCE</small>
