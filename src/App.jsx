@@ -1,4 +1,5 @@
 import { useEffect, useMemo, useRef, useState } from "react";
+import { prefersReducedMotion, useReducedMotion } from "./useReducedMotion.js";
 
 const sections = [
   { id: "home", label: { zh: "首页", en: "HOME" } },
@@ -18,10 +19,10 @@ const skills = [
       { name: "Hive", score: 90, detail: { zh: "数仓建模 / SQL 调优", en: "Warehouse modeling / SQL tuning" } },
       { name: "Spark", score: 92, detail: { zh: "分布式计算 / 流批一体", en: "Distributed compute / streaming" } },
       { name: "Inceptor", score: 80, detail: { zh: "MPP / 查询加速", en: "MPP / query acceleration" } },
-      { name: "数据仓库建模", score: 88, detail: { zh: "维度建模 / 分层治理", en: "Dimensional modeling / governance" } },
-      { name: "数据运维", score: 84, detail: { zh: "调度 / 监控 / 稳定性", en: "Scheduling / monitoring / reliability" } },
+      { name: { zh: "数据仓库建模", en: "Warehouse modeling" }, score: 88, detail: { zh: "维度建模 / 分层治理", en: "Dimensional modeling / governance" } },
+      { name: { zh: "数据运维", en: "Data operations" }, score: 84, detail: { zh: "调度 / 监控 / 稳定性", en: "Scheduling / monitoring / reliability" } },
     ],
-    tags: ["SQL", "ETL", "Scala", "PySpark", "调度", "治理"],
+    tags: ["SQL", "ETL", "Scala", "PySpark", { zh: "调度", en: "Scheduling" }, { zh: "治理", en: "Governance" }],
   },
   {
     title: { zh: "AI 工具链", en: "AI TOOLCHAIN" },
@@ -32,9 +33,9 @@ const skills = [
       { name: "Claude Code", score: 90, detail: { zh: "代码理解 / 自动化执行", en: "Code reasoning / autonomous execution" } },
       { name: "Codex", score: 84, detail: { zh: "生成式协作 / 重构", en: "Generative pairing / refactoring" } },
       { name: "DeepSeek Harness", score: 86, detail: { zh: "大模型调度 / Prompt 工程", en: "LLM routing / prompt engineering" } },
-      { name: "主流 Agent 编程工具", score: 82, detail: { zh: "Agent 协同 / 工作流编排", en: "Agent collaboration / workflows" } },
+      { name: { zh: "主流 Agent 编程工具", en: "Agent coding tools" }, score: 82, detail: { zh: "Agent 协同 / 工作流编排", en: "Agent collaboration / workflows" } },
     ],
-    tags: ["Agent", "RAG", "MCP", "Prompt", "自动化", "评测"],
+    tags: ["Agent", "RAG", "MCP", "Prompt", { zh: "自动化", en: "Automation" }, { zh: "评测", en: "Evaluation" }],
   },
 ];
 
@@ -66,6 +67,21 @@ const copy = {
     taglineEn: "Building value with data, delivering intelligence with engineering.",
     contact: "联系我",
     resume: "下载简历",
+    resumeHint: "PDF 简历准备中，可通过下方联系方式与我交流。",
+    pageTitle: "ZSZ｜数据开发 × AI 探索",
+    backToTop: "返回顶部",
+    switchLanguage: "Switch to English",
+    sectionNavigation: "章节导航",
+    capabilitySignal: "能力信号",
+    copyAction: "复制",
+    emailLabel: "邮箱",
+    wechatLabel: "微信",
+    locationLabel: "所在地",
+    previewPlaceholder: "项目封面待补充",
+    demoImageAlt: "数据看板演示占位图",
+    particleImageAlt: "流动的数据粒子",
+    codeLabel: "动态代码展示",
+    footerMotto: "数据驱动价值 · AI 激发可能",
     running: "系统在线",
     live: "实时流",
     scroll: "滚动探索",
@@ -82,7 +98,7 @@ const copy = {
     coming: "待补充 / COMING SOON",
     details: "查看详情",
     focus: "当前聚焦",
-    hoverHint: "悬停技能查看细节",
+    hoverHint: "悬停或点击技能查看细节",
     demoName: "数据流实时监控与智能告警演示",
     demoDescription: "展示从数据接入到指标服务的完整链路，以及智能告警如何协助定位异常。",
     play: "播放演示",
@@ -108,9 +124,24 @@ const copy = {
     identity: "DATA ENGINEER × AI ENTHUSIAST",
     identityEn: "Data Engineer × AI Enthusiast",
     tagline: "Building value with data, delivering intelligence with engineering.",
-    taglineEn: "用数据构建可靠价值，以工程化思维迎接智能浪潮。",
+    taglineEn: "Reliable data foundations. Practical AI exploration.",
     contact: "GET IN TOUCH",
     resume: "DOWNLOAD RESUME",
+    resumeHint: "The PDF resume is being prepared. Contact details are available below.",
+    pageTitle: "ZSZ | Data Engineering × AI Exploration",
+    backToTop: "Back to top",
+    switchLanguage: "切换到中文",
+    sectionNavigation: "Section navigation",
+    capabilitySignal: "capability signal",
+    copyAction: "COPY",
+    emailLabel: "EMAIL",
+    wechatLabel: "WECHAT",
+    locationLabel: "LOCATION",
+    previewPlaceholder: "PROJECT VISUAL PLACEHOLDER",
+    demoImageAlt: "Data dashboard demo placeholder",
+    particleImageAlt: "Luminous streaming data particles",
+    codeLabel: "Animated code stream",
+    footerMotto: "DATA IS THE NEW OIL · AI IS THE ENGINE",
     running: "SYSTEM ONLINE",
     live: "LIVE STREAM",
     scroll: "SCROLL TO EXPLORE",
@@ -127,7 +158,7 @@ const copy = {
     coming: "COMING SOON",
     details: "VIEW DETAILS",
     focus: "FOCUS",
-    hoverHint: "HOVER A SKILL FOR DETAILS",
+    hoverHint: "HOVER OR SELECT A SKILL FOR DETAILS",
     demoName: "Real-time Data Stream & Smart Alerts",
     demoDescription: "A look at the full path from ingestion to serving, and how AI helps locate anomalies.",
     play: "PLAY DEMO",
@@ -182,20 +213,66 @@ function SectionHeader({ index, title, sub, id }) {
   );
 }
 
+function SkillRow({ item, id, lang, visible, onFocusSkill }) {
+  const [expanded, setExpanded] = useState(false);
+  const [hovered, setHovered] = useState(false);
+  const open = expanded || hovered;
+  return (
+    <div className="skill-entry" onPointerEnter={(event) => { if (event.pointerType === "mouse") { setHovered(true); onFocusSkill(); } }} onPointerLeave={() => setHovered(false)}>
+      <button type="button" className="skill-row" aria-expanded={open} aria-controls={`${id}-detail`} onFocus={onFocusSkill} onClick={() => { setHovered(false); setExpanded((current) => !current); }}>
+        <span className="skill-name">{localize(item.name, lang)}</span>
+        <span className="skill-bar"><span className="skill-bar-fill" style={{ width: visible ? `${item.score}%` : "0%" }} /></span>
+        <span className="skill-score">{item.score}%</span>
+      </button>
+      <p id={`${id}-detail`} className={`skill-detail ${expanded ? "skill-detail--expanded" : "skill-detail--preview"}`} hidden={!open}>{localize(item.detail, lang)}</p>
+    </div>
+  );
+}
+
+function ScrollProgress() {
+  const ref = useRef(null);
+  useEffect(() => {
+    let frame = null;
+    const update = () => {
+      frame = null;
+      const max = document.documentElement.scrollHeight - window.innerHeight;
+      const fraction = max > 0 ? window.scrollY / max : 0;
+      if (ref.current) ref.current.style.transform = `scaleY(${Math.min(1, Math.max(0.1, fraction))})`;
+    };
+    const schedule = () => { if (frame === null) frame = window.requestAnimationFrame(update); };
+    update();
+    window.addEventListener("scroll", schedule, { passive: true });
+    window.addEventListener("resize", schedule);
+    return () => {
+      window.removeEventListener("scroll", schedule);
+      window.removeEventListener("resize", schedule);
+      if (frame !== null) window.cancelAnimationFrame(frame);
+    };
+  }, []);
+  return <div ref={ref} className="scroll-progress" aria-hidden="true" />;
+}
+
 export function App() {
+  const reducedMotion = useReducedMotion();
   const [lang, setLang] = useState("zh");
+  const [showResumeNotice, setShowResumeNotice] = useState(false);
   const [activeSection, setActiveSection] = useState("home");
   const [visibleSections, setVisibleSections] = useState(new Set(["home"]));
-  const [focusSkill, setFocusSkill] = useState("Hive");
+  const [focusSkill, setFocusSkill] = useState("01-0");
   const [isPlaying, setIsPlaying] = useState(false);
   const [videoProgress, setVideoProgress] = useState(16);
-  const [scrollProgress, setScrollProgress] = useState(8);
   const [streamIndex, setStreamIndex] = useState(0);
   const terminalRef = useRef(null);
   const tiltTargetRef = useRef({ x: 0, y: 0 });
   const tiltCurrentRef = useRef({ x: 0, y: 0 });
   const tiltFrameRef = useRef(null);
   const t = copy[lang];
+
+  useEffect(() => {
+    document.documentElement.lang = lang === "zh" ? "zh-CN" : "en";
+    document.title = t.pageTitle;
+    document.querySelector('meta[name="description"]')?.setAttribute("content", t.pageTitle);
+  }, [lang, t.pageTitle]);
 
   const streamReadouts = useMemo(() => [
     { label: t.throughput, value: "1.2k r/s" },
@@ -205,7 +282,7 @@ export function App() {
 
   useEffect(() => {
     const revealAll = () => setVisibleSections(new Set(sections.map((section) => section.id)));
-    if (!("IntersectionObserver" in window)) {
+    if (reducedMotion || !("IntersectionObserver" in window)) {
       revealAll();
       return undefined;
     }
@@ -219,7 +296,7 @@ export function App() {
           });
           return next;
         });
-      }, { threshold: 0.18, rootMargin: "0px 0px -12% 0px" });
+      }, { threshold: 0.01, rootMargin: "0px 0px -12% 0px" });
 
       document.querySelectorAll("[data-section]").forEach((section) => observer.observe(section));
       return () => observer.disconnect();
@@ -227,7 +304,7 @@ export function App() {
       revealAll();
       return undefined;
     }
-  }, []);
+  }, [reducedMotion]);
 
   useEffect(() => {
     if (!("IntersectionObserver" in window)) return undefined;
@@ -245,44 +322,41 @@ export function App() {
   }, []);
 
   useEffect(() => {
+    if (reducedMotion) return undefined;
     const timer = window.setInterval(() => setStreamIndex((current) => (current + 1) % streamReadouts.length), 1800);
     return () => window.clearInterval(timer);
-  }, [streamReadouts.length]);
+  }, [streamReadouts.length, reducedMotion]);
 
   useEffect(() => {
-    if (!isPlaying) return undefined;
+    if (!isPlaying || reducedMotion) return undefined;
     const timer = window.setInterval(() => {
       setVideoProgress((current) => current >= 100 ? 0 : current + 1.2);
     }, 120);
     return () => window.clearInterval(timer);
-  }, [isPlaying]);
+  }, [isPlaying, reducedMotion]);
 
   useEffect(() => {
-    const updateScrollProgress = () => {
-      const maxScroll = document.documentElement.scrollHeight - window.innerHeight;
-      setScrollProgress(maxScroll > 0 ? Math.max(8, (window.scrollY / maxScroll) * 100) : 8);
-    };
-
-    updateScrollProgress();
-    window.addEventListener("scroll", updateScrollProgress, { passive: true });
-    window.addEventListener("resize", updateScrollProgress);
-    return () => {
-      window.removeEventListener("scroll", updateScrollProgress);
-      window.removeEventListener("resize", updateScrollProgress);
-    };
-  }, []);
+    if (!reducedMotion) return;
+    if (tiltFrameRef.current) window.cancelAnimationFrame(tiltFrameRef.current);
+    tiltFrameRef.current = null;
+    tiltTargetRef.current = { x: 0, y: 0 };
+    tiltCurrentRef.current = { x: 0, y: 0 };
+    if (terminalRef.current) terminalRef.current.style.transform = "none";
+    setIsPlaying(false);
+  }, [reducedMotion]);
 
   useEffect(() => () => {
     if (tiltFrameRef.current) window.cancelAnimationFrame(tiltFrameRef.current);
   }, []);
 
   const scrollTo = (id) => {
-    document.getElementById(id)?.scrollIntoView({ behavior: "smooth", block: "start" });
+    document.getElementById(id)?.scrollIntoView({ behavior: prefersReducedMotion() ? "instant" : "smooth", block: "start" });
   };
 
   const animateTerminalTilt = () => {
     const element = terminalRef.current;
-    if (!element) {
+    if (!element || prefersReducedMotion()) {
+      if (element) element.style.transform = "none";
       tiltFrameRef.current = null;
       return;
     }
@@ -304,16 +378,18 @@ export function App() {
   };
 
   const handleTerminalMove = (event) => {
-    if (event.pointerType === "touch") return;
+    if (event.pointerType === "touch" || prefersReducedMotion()) return;
     const bounds = terminalRef.current?.getBoundingClientRect();
     if (!bounds) return;
-    const x = ((event.clientX - bounds.left) / bounds.width - 0.5) * 2;
-    const y = ((event.clientY - bounds.top) / bounds.height - 0.5) * 2;
+    if (!bounds.width || !bounds.height) return;
+    const x = Math.max(-1, Math.min(1, ((event.clientX - bounds.left) / bounds.width - 0.5) * 2));
+    const y = Math.max(-1, Math.min(1, ((event.clientY - bounds.top) / bounds.height - 0.5) * 2));
     tiltTargetRef.current = { x: x * 7, y: y * -7 };
     if (!tiltFrameRef.current) tiltFrameRef.current = window.requestAnimationFrame(animateTerminalTilt);
   };
 
   const resetTerminalTilt = () => {
+    if (prefersReducedMotion()) return;
     tiltTargetRef.current = { x: 0, y: 0 };
     if (!tiltFrameRef.current) tiltFrameRef.current = window.requestAnimationFrame(animateTerminalTilt);
   };
@@ -321,10 +397,10 @@ export function App() {
   return (
     <main className="site-shell">
       <div className="noise-layer" aria-hidden="true" />
-      <div className="scroll-progress" style={{ height: `${scrollProgress}%` }} aria-hidden="true" />
+      <ScrollProgress />
 
       <header className="topbar">
-        <button className="brand-lockup" onClick={() => scrollTo("home")} aria-label="Back to top">
+        <button className="brand-lockup" onClick={() => scrollTo("home")} aria-label={t.backToTop}>
           <span className="brand-mark" aria-hidden="true"><img className="z-spin" src="/favicon.svg" alt="" /></span>
           <span>
             <strong>{t.brand}</strong>
@@ -336,14 +412,14 @@ export function App() {
           <span className="topbar-divider">/</span>
           <span className="status-pulse">{t.live}</span>
         </div>
-        <button className="language-toggle" onClick={() => setLang((current) => current === "zh" ? "en" : "zh")} aria-label="Switch language">
-          <span className={lang === "zh" ? "is-active" : ""}>中</span>
+        <button className="language-toggle" onClick={() => setLang((current) => current === "zh" ? "en" : "zh")} aria-label={t.switchLanguage}>
+          <span lang="zh-CN" className={lang === "zh" ? "is-active" : ""}>中</span>
           <span className="toggle-divider">/</span>
-          <span className={lang === "en" ? "is-active" : ""}>EN</span>
+          <span lang="en" className={lang === "en" ? "is-active" : ""}>EN</span>
         </button>
       </header>
 
-      <aside className="section-nav" aria-label="Section navigation">
+      <aside className="section-nav" aria-label={t.sectionNavigation}>
         <div className="nav-line" />
         {sections.map((section, index) => (
           <button
@@ -355,7 +431,7 @@ export function App() {
             <span className="nav-label">{localize(section.label, lang)}</span>
           </button>
         ))}
-        <div className="nav-scroll-label">SCROLL<br /><span>↓</span></div>
+        <div className="nav-scroll-label">{t.scroll}<br /><span>↓</span></div>
       </aside>
 
       <section id="home" data-section="home" className="hero section-wrap">
@@ -375,11 +451,12 @@ export function App() {
               {t.contact}
               <span className="button-arrow" aria-hidden="true">→</span>
             </button>
-            <button className="secondary-button" onClick={() => scrollTo("projects")}>
+            <button className="secondary-button" type="button" onClick={() => setShowResumeNotice(true)} title={t.resumeHint} aria-describedby={showResumeNotice ? "resume-status" : undefined}>
               {t.resume}
               <span className="button-arrow" aria-hidden="true">↓</span>
             </button>
           </div>
+          <p id="resume-status" className="resume-notice" role="status">{showResumeNotice ? t.resumeHint : ""}</p>
           <div className="hero-meta">
             <span><b className="meta-symbol">@</b> {t.location}</span>
             <span><b className="meta-symbol">↗</b> {t.available}</span>
@@ -400,7 +477,7 @@ export function App() {
               <span className="terminal-live"><span className="status-dot" /> {t.live}</span>
             </div>
             <div className="terminal-body">
-              <div className="code-stream" aria-label="Animated code stream">
+              <div className="code-stream" aria-label={t.codeLabel}>
                 {[
                   "import data as d",
                   "import ai",
@@ -419,7 +496,7 @@ export function App() {
                 <div className="code-prompt"><span>$</span> signal@terminal:~ {""}<i className="typing-cursor" /></div>
               </div>
               <div className="particle-window">
-                <img src="/assets/particle-stream.png" alt="Luminous streaming data particles" />
+                <img src="/assets/particle-stream.png" alt={t.particleImageAlt} />
                 <div className="particle-labels"><span>DATA PARTICLES</span><span>LIVE TELEMETRY</span></div>
               </div>
             </div>
@@ -459,31 +536,21 @@ export function App() {
               </div>
               <div className="skill-panel-body">
                 <div className="skill-list">
-                  {group.items.map((item) => (
-                    <button
-                      className={`skill-row ${focusSkill === item.name ? "is-focused" : ""}`}
-                      key={item.name}
-                      onMouseEnter={() => setFocusSkill(item.name)}
-                      onFocus={() => setFocusSkill(item.name)}
-                    >
-                      <span className="skill-name">{item.name}</span>
-                      <span className="skill-bar"><span className="skill-bar-fill" style={{ width: visibleSections.has("skills") ? `${item.score}%` : "0%" }} /></span>
-                      <span className="skill-score">{item.score}%</span>
-                      <span className="skill-detail">{localize(item.detail, lang)}</span>
-                    </button>
+                  {group.items.map((item, index) => (
+                    <SkillRow key={`${group.code}-${index}`} id={`skill-${group.code}-${index}`} item={item} lang={lang} visible={visibleSections.has("skills")} onFocusSkill={() => setFocusSkill(`${group.code}-${index}`)} />
                   ))}
                 </div>
-                <div className="skill-dial" aria-label={`${localize(group.title, lang)} capability signal`}>
+                <div className="skill-dial" aria-label={`${localize(group.title, lang)} ${t.capabilitySignal}`}>
                   <div className="dial-ring dial-ring--outer" />
                   <div className="dial-ring dial-ring--middle" />
-                  <div className="dial-core"><span>{group.accent === "lime" ? "DATA" : "AI"}</span><b>{focusSkill === group.items[0].name || focusSkill === group.items[3].name ? "96" : "88"}</b></div>
+                  <div className="dial-core"><span>{group.accent === "lime" ? "DATA" : "AI"}</span><b>{focusSkill === `${group.code}-0` || focusSkill === `${group.code}-3` ? "96" : "88"}</b></div>
                   <span className="dial-axis dial-axis--top">{group.accent === "lime" ? "MODEL" : "AGENT"}</span>
                   <span className="dial-axis dial-axis--right">{group.accent === "lime" ? "ETL" : "RAG"}</span>
                   <span className="dial-axis dial-axis--bottom">{group.accent === "lime" ? "OPS" : "MCP"}</span>
                   <span className="dial-axis dial-axis--left">{group.accent === "lime" ? "SQL" : "LLM"}</span>
                 </div>
               </div>
-              <div className="skill-tags">{group.tags.map((tag) => <span key={tag}>{tag}</span>)}</div>
+              <div className="skill-tags">{group.tags.map((tag) => <span key={localize(tag, "en")}>{localize(tag, lang)}</span>)}</div>
             </article>
           ))}
         </div>
@@ -502,7 +569,7 @@ export function App() {
               <div className="project-card-top"><span>{project.code}</span><b>{t.coming}</b></div>
               <div className="project-preview" aria-label={t.coming}>
                 <div className="preview-grid" aria-hidden="true" />
-                <div className="preview-center"><span className="preview-bracket">[ ]</span><strong>{t.coming}</strong><small>PROJECT VISUAL PLACEHOLDER</small></div>
+                <div className="preview-center"><span className="preview-bracket">[ ]</span><strong>{t.coming}</strong><small>{t.previewPlaceholder}</small></div>
                 <span className="preview-corner">{project.accent === "lime" ? "DATA / 01" : "AI / 02"}</span>
               </div>
               <div className="project-info">
@@ -522,7 +589,7 @@ export function App() {
         <SectionHeader id="demo" index="03" title={t.demoTitle} sub={t.demoSub} />
         <div className="demo-layout">
           <div className="demo-player">
-            <img src="/assets/demo-dashboard.png" alt="Dark data dashboard demo placeholder" />
+            <img src="/assets/demo-dashboard.png" alt={t.demoImageAlt} loading="lazy" decoding="async" />
             <div className="demo-overlay"><span className="demo-status"><span className="status-dot" /> {t.live}</span><span>00:00 / 01:24</span></div>
             <button className={`demo-play ${isPlaying ? "is-playing" : ""}`} onClick={() => setIsPlaying((current) => !current)} aria-label={isPlaying ? t.pause : t.play}>
               <span>{isPlaying ? "||" : ">"}</span>
@@ -560,16 +627,16 @@ export function App() {
       <section id="contact" data-section="contact" className={`content-section content-section--last section-wrap ${visibleSections.has("contact") ? "is-visible" : ""}`}>
         <SectionHeader id="contact" index="05" title={t.contactTitle} sub={t.contactSub} />
         <div className="contact-grid">
-          <a href={`mailto:${t.email}`} className="contact-item"><span className="contact-label">EMAIL</span><strong>{t.email}</strong><span className="contact-action">↗</span></a>
-          <button className="contact-item" onClick={() => navigator.clipboard?.writeText(t.wechat)}><span className="contact-label">WECHAT</span><strong>{t.wechat}</strong><span className="contact-action">COPY</span></button>
-          <div className="contact-item"><span className="contact-label">LOCATION</span><strong>{t.location}</strong><span className="contact-action">UTC+8</span></div>
+          <a href={`mailto:${t.email}`} className="contact-item"><span className="contact-label">{t.emailLabel}</span><strong>{t.email}</strong><span className="contact-action">↗</span></a>
+          <button className="contact-item" onClick={() => navigator.clipboard?.writeText(t.wechat)}><span className="contact-label">{t.wechatLabel}</span><strong>{t.wechat}</strong><span className="contact-action">{t.copyAction}</span></button>
+          <div className="contact-item"><span className="contact-label">{t.locationLabel}</span><strong>{t.location}</strong><span className="contact-action">UTC+8</span></div>
         </div>
       </section>
 
       <footer className="footer">
         <span>© 2025 {t.name} · {t.built}</span>
-        <span>DATA IS THE NEW OIL · AI IS THE ENGINE</span>
-        <button onClick={() => scrollTo("home")}>SCROLL TO TOP ↑</button>
+        <span>{t.footerMotto}</span>
+        <button onClick={() => scrollTo("home")}>{t.backToTop} ↑</button>
       </footer>
     </main>
   );

@@ -74,10 +74,12 @@ a { color: inherit; text-decoration: none; }
   right: 8px;
   z-index: 40;
   width: 4px;
-  min-height: 10%;
+  height: 100%;
+  transform: scaleY(0.1);
+  transform-origin: top;
   background: var(--violet);
   box-shadow: 0 0 0 1px rgba(118, 89, 233, 0.12), 0 0 16px rgba(118, 89, 233, 0.4);
-  transition: height 220ms ease-out;
+  transition: transform 220ms ease-out;
 }
 
 .topbar {
@@ -89,6 +91,7 @@ a { color: inherit; text-decoration: none; }
   display: flex;
   align-items: center;
   justify-content: space-between;
+  gap: 12px;
   height: 76px;
   padding: 0 64px;
   border-bottom: 1px solid rgba(17, 23, 21, 0.16);
@@ -107,7 +110,9 @@ a { color: inherit; text-decoration: none; }
   cursor: pointer;
 }
 
-.brand-lockup > span:last-child { display: grid; gap: 3px; }
+.brand-lockup { min-width: 0; }
+.brand-lockup > span:last-child { display: grid; gap: 3px; min-width: 0; }
+.brand-lockup strong, .brand-lockup small { overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
 .brand-lockup strong { color: var(--ink); font-family: var(--mono); font-size: 16px; font-weight: 500; letter-spacing: 0.04em; text-transform: uppercase; }
 .brand-lockup small { color: var(--muted); font-family: var(--mono); font-size: 9px; letter-spacing: 0.13em; }
 
@@ -143,6 +148,7 @@ a { color: inherit; text-decoration: none; }
 .status-dot { display: inline-block; width: 6px; height: 6px; border-radius: 50%; background: var(--lime); box-shadow: 0 0 0 4px rgba(185, 242, 74, 0.15); }
 
 .language-toggle {
+  flex-shrink: 0;
   display: inline-flex;
   align-items: center;
   gap: 10px;
@@ -287,6 +293,8 @@ a { color: inherit; text-decoration: none; }
 .primary-button:hover, .primary-button:focus-visible { transform: translate(-2px, -3px); box-shadow: 9px 9px 0 rgba(118, 89, 233, 0.8); outline: none; }
 .secondary-button { border: 1px solid rgba(247, 244, 236, 0.42); background: transparent; color: var(--cream); }
 .secondary-button:hover, .secondary-button:focus-visible { border-color: var(--orange); color: var(--orange); transform: translateY(-3px); outline: none; }
+.resume-notice { max-width: 500px; margin: 0; color: var(--cream); font-size: 13px; line-height: 1.6; }
+.resume-notice:not(:empty) { margin-top: 12px; padding: 8px 12px; border-left: 2px solid var(--orange); background: rgba(247, 244, 236, 0.05); }
 .button-prompt { font-size: 14px; }
 .button-arrow { margin-left: 3px; font-size: 16px; }
 .hero-meta { display: flex; flex-wrap: wrap; gap: 18px; margin-top: 30px; color: rgba(247, 244, 236, 0.56); font-family: var(--mono); font-size: 9px; letter-spacing: 0.02em; }
@@ -400,24 +408,30 @@ a { color: inherit; text-decoration: none; }
 }
 .skill-panel--violet { --panel-accent: var(--violet); box-shadow: 10px 10px 0 rgba(239, 107, 57, 0.24); }
 .skill-panel--lime { --panel-accent: var(--lime); }
-.skill-panel:hover { transform: translate(-3px, -4px); border-color: var(--panel-accent); }
+.skill-panel:hover { border-color: var(--panel-accent); }
 .skill-panel-head { display: flex; align-items: center; gap: 12px; padding: 18px 18px 16px; border-bottom: 1px solid rgba(247, 244, 236, 0.17); }
 .skill-code { color: var(--panel-accent); font-family: var(--mono); font-size: 12px; }
 .skill-panel-head h3 { margin: 0; color: var(--panel-accent); font-size: 19px; font-weight: 600; letter-spacing: -0.04em; }
 .skill-panel-head > div > span { color: rgba(247, 244, 236, 0.5); font-family: var(--mono); font-size: 8px; letter-spacing: 0.1em; }
 .panel-live { margin-left: auto; color: var(--panel-accent); font-family: var(--mono); font-size: 8px; letter-spacing: 0.1em; }
 .skill-panel-body { display: grid; grid-template-columns: minmax(0, 1fr) 160px; gap: 20px; align-items: center; padding: 20px 18px 11px; }
-.skill-list { display: grid; gap: 4px; }
-.skill-row { position: relative; display: grid; grid-template-columns: minmax(100px, 1.1fr) minmax(70px, 1fr) 35px; gap: 12px; align-items: center; min-height: 32px; padding: 0; border: 0; background: transparent; color: rgba(247, 244, 236, 0.62); text-align: left; cursor: pointer; }
-.skill-name { overflow: hidden; color: var(--cream); font-size: 11px; text-overflow: ellipsis; white-space: nowrap; }
+.skill-list { display: grid; gap: 4px; min-width: 0; }
+.skill-entry { position: relative; min-width: 0; }
+.skill-row { position: relative; display: grid; width: 100%; grid-template-columns: minmax(0, 1.3fr) minmax(40px, 0.8fr) 35px; gap: 12px; align-items: center; min-height: 38px; padding: 4px 0; border: 0; background: transparent; color: rgba(247, 244, 236, 0.62); text-align: left; cursor: pointer; }
+.skill-name { min-width: 0; color: var(--cream); font-size: 12px; overflow-wrap: anywhere; }
+.skill-row:focus-visible { outline: 2px solid var(--panel-accent); outline-offset: 3px; }
 .skill-score { color: var(--panel-accent); font-family: var(--mono); font-size: 9px; text-align: right; }
 .skill-bar { overflow: hidden; height: 5px; border-radius: 0; background: rgba(247, 244, 236, 0.16); }
 .skill-bar-fill { display: block; height: 100%; border-radius: inherit; background: var(--panel-accent); box-shadow: 0 0 10px rgba(185, 242, 74, 0.3); transition: width 1.2s cubic-bezier(.22,1,.36,1); }
 .skill-row::after { position: absolute; right: -9px; bottom: -2px; left: -7px; height: 1px; background: transparent; content: ''; transition: background 180ms ease; }
-.skill-row:hover .skill-name, .skill-row.is-focused .skill-name { color: var(--panel-accent); }
-.skill-row:hover::after, .skill-row.is-focused::after { background: color-mix(in srgb, var(--panel-accent) 55%, transparent); }
-.skill-detail { position: absolute; z-index: 5; top: calc(100% + 7px); left: 0; visibility: hidden; padding: 6px 8px; border: 1px solid var(--panel-accent); border-radius: 2px; background: var(--cream); color: var(--ink); font-family: var(--mono); font-size: 8px; opacity: 0; transition: opacity 180ms ease, transform 180ms ease; transform: translateY(-4px); white-space: nowrap; }
-.skill-row:hover .skill-detail, .skill-row:focus-visible .skill-detail, .skill-row.is-focused .skill-detail { visibility: visible; opacity: 1; transform: translateY(0); }
+.skill-row:hover .skill-name, .skill-row:focus-visible .skill-name { color: var(--panel-accent); }
+.skill-row:hover::after { background: color-mix(in srgb, var(--panel-accent) 55%, transparent); }
+.skill-detail { margin: 4px 0 8px; padding: 8px 10px; border-left: 2px solid var(--panel-accent); background: var(--cream); color: var(--ink); font-family: var(--mono); font-size: 12px; line-height: 1.6; overflow-wrap: anywhere; }
+/* Mouse previews must not change row/card height or intercept the next row.
+   Only an explicit click/keyboard activation expands details in the layout. */
+.skill-detail--preview { position: absolute; z-index: 10; right: 0; bottom: calc(100% + 6px); left: 0; margin: 0; pointer-events: none; box-shadow: 0 4px 12px rgba(0, 0, 0, 0.22); }
+.skill-detail--expanded { position: static; }
+.skill-detail[hidden] { display: none; }
 
 .skill-dial { position: relative; display: grid; place-items: center; width: 150px; height: 150px; margin: 0 auto; color: var(--panel-accent); }
 .dial-ring { position: absolute; border: 1px solid color-mix(in srgb, var(--panel-accent) 70%, transparent); border-radius: 50%; }
@@ -567,7 +581,13 @@ button.contact-item { cursor: pointer; }
   100% { transform: rotate(360deg); }
 }
 
+@media (min-width: 1081px) and (max-width: 1200px) {
+  .skill-panel-body { grid-template-columns: minmax(0, 1fr); }
+  .skill-dial { display: none; }
+}
+
 @media (max-width: 1080px) {
+  .skills-grid { grid-template-columns: minmax(0, 1fr); }
   .topbar { padding: 0 30px; }
   .section-nav { left: 22px; }
   .section-wrap, .footer { width: min(900px, calc(100% - 170px)); }
@@ -615,8 +635,8 @@ button.contact-item { cursor: pointer; }
   .skill-panel { box-shadow: 6px 6px 0 rgba(118, 89, 233, 0.16); }
   .skill-panel-body { grid-template-columns: 1fr; }
   .skill-dial { display: none; }
-  .skill-row { grid-template-columns: minmax(98px, 1.05fr) minmax(70px, 1fr) 34px; gap: 9px; }
-  .skill-detail { display: none; }
+  .skill-row { grid-template-columns: minmax(0, 1.3fr) minmax(40px, 0.8fr) 34px; gap: 9px; min-height: 44px; }
+  .skill-name { font-size: 14px; }
   .project-preview { min-height: 180px; }
   .demo-player, .demo-player img { min-height: 240px; height: 240px; }
   .demo-copy { padding-right: 0; }
@@ -632,5 +652,7 @@ button.contact-item { cursor: pointer; }
     transition-duration: 0.01ms !important;
   }
 
-  .brand-mark img.z-spin { animation: none; }
+  .brand-mark img.z-spin { animation: none; will-change: auto; }
+  .terminal-card-wrap { transform: none !important; will-change: auto; }
+  .brand-lockup:hover .brand-mark, .brand-lockup:focus-visible .brand-mark { transform: none; }
 }
