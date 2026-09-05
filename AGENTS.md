@@ -11,6 +11,7 @@ Build app UI in `src/`. Keep `.openai/hosting.json`, `worker/index.js`, `scripts
 ## Product decision
 
 - Dynamic behavior is a hard requirement for this resume site: keep the scroll reveal, animated data/particle treatment, terminal cursor/status motion, skill bar entrance, hover feedback, demo playback state, and global language toggle working as the prototype evolves.
+- The user chose to restore the original terminal particle artwork (`public/assets/particle-stream.png`) with its subtle 12-second CSS drift. Keep this appearance; the experimental Canvas particle renderers and overlays were removed.
 
 ## Technical baseline
 
@@ -22,6 +23,8 @@ Build app UI in `src/`. Keep `.openai/hosting.json`, `worker/index.js`, `scripts
 
 ## Project direction
 
+- The personal display name is uppercase `ZSZ` in both Chinese and English, including the hero and footer.
+- The displayed location is `中国 · 上海` / `SHANGHAI, CHINA`; keep it consistent in the hero and contact section.
 - The site serves both hiring reviewers and potential collaborators. Keep the data-engineering × AI-exploration positioning clear, technically credible, and easy to scan in both Chinese and English.
 - Preserve the visual language of cream, deep ink-green, violet, lavender, and orange accents, with terminal, grid, data-stream, and particle metaphors used purposefully.
 - Preserve the mouse-follow terminal tilt, skill and project hover feedback, demo playback, global language switch, and the page-level Z Logo rotation. The browser favicon remains static because Chromium does not animate SVG favicons.
