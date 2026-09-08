@@ -45,11 +45,15 @@ describe("resume site user journeys", () => {
   it("switches page copy, skill labels, tags, title and document language both ways", () => {
     render(<App />);
     expect(document.documentElement.lang).toBe("zh-CN");
+    expect(screen.getByText("data@zszzs.cn").closest("a").getAttribute("href")).toBe("mailto:data@zszzs.cn");
+    expect(screen.getByRole("button", { name: /微信 zszzs123/ })).toBeTruthy();
     expect(screen.getAllByText("中国 · 上海")).toHaveLength(2);
     expect(screen.getByRole("heading", { level: 1 }).textContent).toBe("ZSZ");
     expect(document.querySelector("footer").textContent).toContain("ZSZ");
     fireEvent.click(screen.getByRole("button", { name: "Switch to English" }));
     expect(document.documentElement.lang).toBe("en");
+    expect(screen.getByText("data@zszzs.cn").closest("a").getAttribute("href")).toBe("mailto:data@zszzs.cn");
+    expect(screen.getByRole("button", { name: /WECHAT zszzs123/ })).toBeTruthy();
     expect(screen.getAllByText("SHANGHAI, CHINA")).toHaveLength(2);
     expect(screen.getByRole("heading", { level: 1 }).textContent).toBe("ZSZ");
     expect(document.querySelector("footer").textContent).toContain("ZSZ");

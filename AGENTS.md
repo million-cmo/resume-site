@@ -25,6 +25,7 @@ Build app UI in `src/`. Keep `.openai/hosting.json`, `worker/index.js`, `scripts
 
 - The personal display name is uppercase `ZSZ` in both Chinese and English, including the hero and footer.
 - The displayed location is `中国 · 上海` / `SHANGHAI, CHINA`; keep it consistent in the hero and contact section.
+- Public contact details are `data@zszzs.cn` (email) and `zszzs123` (WeChat). Keep both language versions, the `mailto:` link and clipboard value consistent.
 - The site serves both hiring reviewers and potential collaborators. Keep the data-engineering × AI-exploration positioning clear, technically credible, and easy to scan in both Chinese and English.
 - Preserve the visual language of cream, deep ink-green, violet, lavender, and orange accents, with terminal, grid, data-stream, and particle metaphors used purposefully.
 - Preserve the mouse-follow terminal tilt, skill and project hover feedback, demo playback, global language switch, and the page-level Z Logo rotation. The browser favicon remains static because Chromium does not animate SVG favicons.

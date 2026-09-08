@@ -13,7 +13,7 @@ function setClipboard(writeText) {
   Object.defineProperty(navigator, "clipboard", { configurable: true, value: writeText ? { writeText } : undefined });
 }
 
-const copyButton = () => screen.getByRole("button", { name: /微信 your_wechat_id/ });
+const copyButton = () => screen.getByRole("button", { name: /微信 zszzs123/ });
 const feedback = () => screen.getByRole("status", { name: "复制状态" });
 
 it("waits for a successful clipboard write, announces success and resets after 3.5 seconds", async () => {
@@ -23,7 +23,7 @@ it("waits for a successful clipboard write, announces success and resets after 3
   render(<App />);
   const button = copyButton();
   fireEvent.click(button);
-  expect(writeText).toHaveBeenCalledWith("your_wechat_id");
+  expect(writeText).toHaveBeenCalledWith("zszzs123");
   expect(button.disabled).toBe(true);
   expect(button.getAttribute("aria-busy")).toBe("true");
   expect(feedback().textContent).toBe("正在复制微信号…");
@@ -70,12 +70,16 @@ it("handles unavailable Clipboard API and returns focus when the notice is dismi
 });
 
 it("localizes visible copied feedback immediately when switching languages", async () => {
-  setClipboard(vi.fn().mockResolvedValue(undefined));
+  const writeText = vi.fn().mockResolvedValue(undefined);
+  setClipboard(writeText);
   render(<App />);
   await act(async () => fireEvent.click(copyButton()));
   fireEvent.click(screen.getByRole("button", { name: "Switch to English" }));
   expect(screen.getByRole("status", { name: "Copy status" }).textContent).toBe("WeChat ID copied");
-  expect(screen.getByRole("button", { name: /WECHAT your_wechat_id/ }).textContent).toContain("COPIED");
+  const englishButton = screen.getByRole("button", { name: /WECHAT zszzs123/ });
+  expect(englishButton.textContent).toContain("COPIED");
+  await act(async () => fireEvent.click(englishButton));
+  expect(writeText).toHaveBeenLastCalledWith("zszzs123");
 });
 
 it("restarts the success timer on a second successful copy", async () => {
