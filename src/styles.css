@@ -483,9 +483,10 @@ a { color: inherit; text-decoration: none; }
 .project-info h3 { margin: 0 0 8px; color: var(--cream); font-size: 20px; font-weight: 600; letter-spacing: -0.04em; }
 .project-info p { min-height: 37px; margin: 0 0 14px; color: rgba(247, 244, 236, 0.63); font-size: 12px; line-height: 1.6; }
 .project-tags span { border-color: rgba(247, 244, 236, 0.23); color: rgba(247, 244, 236, 0.63); }
-.project-link { display: flex; align-items: center; justify-content: space-between; padding: 13px 1px 1px; border-top: 1px solid rgba(247, 244, 236, 0.2); color: var(--panel-accent); font-family: var(--mono); font-size: 10px; }
+.project-link { display: flex; align-items: center; justify-content: space-between; width: 100%; padding: 13px 1px 1px; border: 0; border-top: 1px solid rgba(247, 244, 236, 0.2); background: transparent; color: var(--panel-accent); font-family: var(--mono); font-size: 10px; text-align: left; }
+.project-link:disabled { color: rgba(247, 244, 236, 0.65); cursor: not-allowed; }
 .project-link span { font-size: 17px; transition: transform 200ms ease; }
-.project-link:hover span { transform: translateX(5px); }
+a.project-link:hover span { transform: translateX(5px); }
 
 .demo-layout { display: grid; grid-template-columns: 1.25fr 0.75fr; gap: 30px; align-items: center; }
 .demo-player { position: relative; overflow: hidden; min-height: 340px; border: 1px solid rgba(17, 23, 21, 0.6); border-radius: 3px; background: var(--ink); box-shadow: 10px 10px 0 rgba(239, 107, 57, 0.34); }
@@ -538,6 +539,43 @@ button.contact-item { cursor: pointer; }
 .contact-label { color: rgba(247, 244, 236, 0.46); font-family: var(--mono); font-size: 8px; letter-spacing: 0.12em; }
 .contact-item strong { color: var(--lime); font-family: var(--mono); font-size: 12px; font-weight: 500; }
 .contact-action { position: absolute; right: 15px; bottom: 14px; color: rgba(247, 244, 236, 0.56); font-family: var(--mono); font-size: 8px; }
+.copy-contact-value { user-select: text; }
+.copy-contact .copy-contact-action { font-size: 10px; }
+.copy-contact:focus-visible { outline: 2px solid var(--lime); outline-offset: 4px; }
+.copy-contact:disabled { cursor: progress; }
+.copy-contact[data-copy-state="success"] { border-color: var(--lime); }
+.copy-contact[data-copy-state="success"] .copy-contact-action { color: var(--lime); }
+.copy-contact[data-copy-state="error"] { border-color: var(--orange); }
+.copy-contact[data-copy-state="error"] .copy-contact-action { color: var(--orange); }
+.copy-toast {
+  position: fixed;
+  z-index: 60;
+  bottom: calc(24px + env(safe-area-inset-bottom, 0px));
+  left: 50%;
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  width: max-content;
+  max-width: calc(100vw - 32px);
+  padding: 10px 12px 10px 18px;
+  border: 1px solid var(--lime);
+  border-radius: 6px;
+  background: var(--ink);
+  color: var(--cream);
+  box-shadow: 0 8px 30px rgba(0, 0, 0, 0.3);
+  font-family: var(--sans);
+  font-size: 14px;
+  line-height: 1.5;
+  transform: translate(-50%, 0);
+  transition: opacity 160ms ease, transform 160ms ease;
+}
+.copy-toast[data-copy-state="idle"] { visibility: hidden; opacity: 0; transform: translate(-50%, 8px); pointer-events: none; }
+.copy-toast[data-copy-state="error"] { border-color: var(--orange); }
+.copy-toast-icon { flex-shrink: 0; color: var(--lime); font-family: var(--mono); font-size: 20px; }
+.copy-toast[data-copy-state="error"] .copy-toast-icon { color: var(--orange); }
+.copy-toast-close { display: grid; place-items: center; flex-shrink: 0; width: 36px; height: 36px; border: 0; border-radius: 4px; background: transparent; color: var(--cream); font-size: 22px; cursor: pointer; }
+.copy-toast-close:hover { background: var(--ink-soft); }
+.copy-toast-close:focus-visible { outline: 2px solid var(--lime); outline-offset: 2px; }
 
 .footer { display: flex; align-items: center; justify-content: space-between; gap: 20px; width: min(1180px, calc(100% - 220px)); margin: 0 auto; padding: 25px 0 35px; border-top: 1px solid rgba(17, 23, 21, 0.2); color: var(--muted); font-family: var(--mono); font-size: 9px; line-height: 1.5; }
 .footer span:nth-child(2) { color: var(--faint); }

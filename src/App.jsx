@@ -1,5 +1,6 @@
 import { useEffect, useMemo, useRef, useState } from "react";
 import { prefersReducedMotion, useReducedMotion } from "./useReducedMotion.js";
+import { CopyContact } from "./CopyContact.jsx";
 
 const sections = [
   { id: "home", label: { zh: "首页", en: "HOME" } },
@@ -74,6 +75,14 @@ const copy = {
     sectionNavigation: "章节导航",
     capabilitySignal: "能力信号",
     copyAction: "复制",
+    copyPending: "复制中…",
+    copyDone: "已复制",
+    copyRetry: "重试",
+    copyPendingMessage: "正在复制微信号…",
+    copySuccess: "微信号已复制",
+    copyError: "复制未成功，请重试或手动复制微信号。",
+    copyStatus: "复制状态",
+    copyDismiss: "关闭复制提示",
     emailLabel: "邮箱",
     wechatLabel: "微信",
     locationLabel: "所在地",
@@ -96,7 +105,7 @@ const copy = {
     contactTitle: "保持联系",
     contactSub: "LET'S CONNECT",
     coming: "待补充 / COMING SOON",
-    details: "查看详情",
+    details: "详情待补充",
     focus: "当前聚焦",
     hoverHint: "悬停或点击技能查看细节",
     demoName: "数据流实时监控与智能告警演示",
@@ -134,6 +143,14 @@ const copy = {
     sectionNavigation: "Section navigation",
     capabilitySignal: "capability signal",
     copyAction: "COPY",
+    copyPending: "COPYING…",
+    copyDone: "COPIED",
+    copyRetry: "RETRY",
+    copyPendingMessage: "Copying WeChat ID…",
+    copySuccess: "WeChat ID copied",
+    copyError: "Could not copy. Please retry or copy the WeChat ID manually.",
+    copyStatus: "Copy status",
+    copyDismiss: "Dismiss copy notification",
     emailLabel: "EMAIL",
     wechatLabel: "WECHAT",
     locationLabel: "LOCATION",
@@ -156,7 +173,7 @@ const copy = {
     contactTitle: "LET'S CONNECT",
     contactSub: "KEEP IN TOUCH",
     coming: "COMING SOON",
-    details: "VIEW DETAILS",
+    details: "DETAILS COMING SOON",
     focus: "FOCUS",
     hoverHint: "HOVER OR SELECT A SKILL FOR DETAILS",
     demoName: "Real-time Data Stream & Smart Alerts",
@@ -577,9 +594,9 @@ export function App() {
                 <p>{localize(project.description, lang)}</p>
                 <div className="project-tags">{project.tags.map((tag) => <span key={tag}>{tag}</span>)}</div>
               </div>
-              <a className="project-link" href="#contact" onClick={(event) => { event.preventDefault(); scrollTo("contact"); }}>
-                {t.details} <span>→</span>
-              </a>
+              <button className="project-link" type="button" disabled>
+                {t.details} <span aria-hidden="true">…</span>
+              </button>
             </article>
           ))}
         </div>
@@ -628,7 +645,7 @@ export function App() {
         <SectionHeader id="contact" index="05" title={t.contactTitle} sub={t.contactSub} />
         <div className="contact-grid">
           <a href={`mailto:${t.email}`} className="contact-item"><span className="contact-label">{t.emailLabel}</span><strong>{t.email}</strong><span className="contact-action">↗</span></a>
-          <button className="contact-item" onClick={() => navigator.clipboard?.writeText(t.wechat)}><span className="contact-label">{t.wechatLabel}</span><strong>{t.wechat}</strong><span className="contact-action">{t.copyAction}</span></button>
+          <CopyContact value={t.wechat} messages={t} />
           <div className="contact-item"><span className="contact-label">{t.locationLabel}</span><strong>{t.location}</strong><span className="contact-action">UTC+8</span></div>
         </div>
       </section>

@@ -36,10 +36,12 @@ Build app UI in `src/`. Keep `.openai/hosting.json`, `worker/index.js`, `scripts
 
 - Run `npm test`, `npm run build`, and `npm run test:sites` for UI changes. Frontend tests cover language switching, resume availability, skill disclosures, motion preferences, and logo assets; the Sites tests cover packaging and route fallback only.
 - Preserve the original outlined “下载简历 / DOWNLOAD RESUME” button, arrow, and hover feedback as requested. Until a real PDF is supplied, activation must show a localized preparation notice, never navigate to projects or simulate a successful download.
+- Project cards and general external links are separate sections. Until project details exist, show disabled “详情待补充 / DETAILS COMING SOON” controls with no navigation. Future detail links must lead to that specific project, never the general links/contact section.
 - Localize skill names and tags as well as page copy; update `document.documentElement.lang`, title, and description when the language changes.
 - Both CSS and JavaScript motion must respect live changes to `prefers-reduced-motion`. Cancel pending tilt frames and reset the transform immediately when it is enabled.
 - Keep skill details usable by hover, keyboard, and touch. Check widths 320, 390, 820, 1100, and 1280 when changing the skill grid or navigation.
 - Skill hover previews must not change card/row heights or move neighboring content. Use a non-intercepting overlay for mouse hover; reserve in-flow expansion for explicit click/keyboard activation. Verify geometry while moving across multiple rows, not just whether the detail text appears.
 - Skill-row hover underlines must disappear on pointer leave. Do not couple them to the persistent skill-dial selection; retain a separate `:focus-visible` outline for keyboard users.
+- Clipboard actions must wait for `writeText` to resolve before showing localized success feedback. The WeChat card shows a temporary copied state and a non-layout-shifting live notification; failures remain visible with retry/manual-copy guidance. Prevent concurrent requests and clean up feedback timers on unmount.
 - Regenerate the Safari icon from the source SVG with `npm run icons:generate`; verify centered content and an opaque 180×180 canvas, not just file dimensions.
 - Dependency fixes should preserve framework major versions where possible and be followed by `npm audit` and regression tests. Do not use forced dependency upgrades.

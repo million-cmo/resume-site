@@ -10,18 +10,36 @@ function terminal() {
 }
 
 describe("resume site user journeys", () => {
+  it("keeps both placeholder project details unavailable without navigating to links or contact", () => {
+    render(<App />);
+    const buttons = screen.getAllByRole("button", { name: "详情待补充" });
+    expect(buttons).toHaveLength(2);
+    for (const button of buttons) {
+      expect(button.disabled).toBe(true);
+      fireEvent.click(button);
+    }
+    expect(Element.prototype.scrollIntoView).not.toHaveBeenCalled();
+    expect(document.querySelectorAll("#projects a")).toHaveLength(0);
+    fireEvent.click(screen.getByRole("button", { name: "Switch to English" }));
+    const englishButtons = screen.getAllByRole("button", { name: "DETAILS COMING SOON" });
+    expect(englishButtons).toHaveLength(2);
+    expect(englishButtons.every(button => button.disabled)).toBe(true);
+    fireEvent.click(screen.getByRole("button", { name: "切换到中文" }));
+    expect(screen.getAllByRole("button", { name: "详情待补充" })).toHaveLength(2);
+  });
+
   it("keeps the original resume button and explains the missing PDF instead of navigating elsewhere", () => {
     render(<App />);
     const button = screen.getByRole("button", { name: "下载简历" });
     expect(button.disabled).toBe(false);
     expect(button.querySelector(".button-arrow").textContent).toBe("↓");
-    expect(screen.getByRole("status").textContent).toBe("");
+    expect(document.getElementById("resume-status").textContent).toBe("");
     fireEvent.click(button);
     expect(Element.prototype.scrollIntoView).not.toHaveBeenCalled();
-    expect(screen.getByRole("status").textContent).toContain("PDF 简历准备中");
+    expect(document.getElementById("resume-status").textContent).toContain("PDF 简历准备中");
     fireEvent.click(screen.getByRole("button", { name: "Switch to English" }));
     expect(screen.getByRole("button", { name: "DOWNLOAD RESUME" }).disabled).toBe(false);
-    expect(screen.getByRole("status").textContent).toContain("The PDF resume is being prepared");
+    expect(document.getElementById("resume-status").textContent).toContain("The PDF resume is being prepared");
   });
 
   it("switches page copy, skill labels, tags, title and document language both ways", () => {
